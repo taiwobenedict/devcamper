@@ -1,14 +1,20 @@
 const express = require('express')
 const router = express.Router()
 
-// Import Views
+// Include other resource routers
+const courseRouter = require("./courseRoutes")
+
+// Re-route into other resource routers
+router.use("/:bootcampId/courses", courseRouter)
+
+// Import Controllers
 const {
   getBootCamps,
   getBootCamp,
   createBootCamp,
   updateBootCamp,
   deleteBootCamp
-} = require('../views/bootcamps')
+} = require('../controllers/bootcamps')
 
 
 // Routes without Id's

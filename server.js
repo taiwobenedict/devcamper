@@ -1,9 +1,11 @@
 const express = require('express')
 const bootcampRoutes = require('./routes/bootcampRoutes')
+const courseRoutes = require('./routes/courseRoutes')
 const dotenv = require('dotenv')
 const color = require('colors')
 const connectDB = require('./database/db')
 const morgan = require('morgan')
+const errorHandler = require('./middleware/error')
 // Initializing Express
 const app = express()
 
@@ -11,11 +13,11 @@ const app = express()
 dotenv.config({path: "./env/config.env"})
 
 
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 5000 
 
 
 
-// cInitializing Database
+// Initializing Database
 connectDB()
 
 // Use Morgan
@@ -26,6 +28,8 @@ app.use(express.json())
 
 // Mount Router
 app.use('/api/v1/bootcamps', bootcampRoutes)
+app.use('/api/v1/courses', courseRoutes)
+app.use(errorHandler)
 
 // Liten to Port
 app.listen(
@@ -37,3 +41,4 @@ app.listen(
 process.on("unhandledRejection", (err) => {
   console.log(`Error: ${err.message}`.red)
 })
+

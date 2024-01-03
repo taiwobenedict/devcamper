@@ -1,9 +1,11 @@
 const mongoose = require("mongoose");
+const slugify = require("slugify")
+
 
 const BootcampSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, "prlease add a name"],
+    required: [true, "please add a name"],
     unique: true,
     trim: true,
     maxlength: [50, "Name can not be more than 50 characters"],
@@ -19,7 +21,7 @@ const BootcampSchema = new mongoose.Schema({
 
   wesite: {
     type: String,
-    match: [/[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/, "Please use a valid URL wiht HTTP or HTTPS" ]
+    match: [/[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/, "Please use a valid URL with HTTP or HTTPS" ]
   },
 
   phone: {
@@ -40,7 +42,7 @@ const BootcampSchema = new mongoose.Schema({
   careers: {
     // Array of string
     type: [String],
-    required: true,
+    required: true,  
     enum: [
       'Web Development',
       "Mobile Development",
@@ -83,7 +85,32 @@ const BootcampSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
+}, {
+  toJSON: {virtuals: true},
+  toObject: {virtuals: true}
 });
+
+
+// Create slug field
+BootcampSchema.pre("save", function(next) {
+  this.slug = slugify(this.name, {lower: true})
+  next()
+})
+
+// Reverse populate with virtuals
+BootcampSchema.virtual("courses", {
+  ref: "Courses",
+  localField: "_id",
+  foreignField: "bootcamp",
+  justOne: false,
+})
+
+// Cascade delete Courses when a bootcamp is deleted
+BootcampSchema.pre("remove", async function(next) {
+  await this.model("Courses").deleteMany({bootcamp: this._id})
+  next()
+})
+
 
 
 module.exports = mongoose.model('Bootcamp', BootcampSchema)
