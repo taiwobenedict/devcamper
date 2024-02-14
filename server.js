@@ -1,11 +1,17 @@
 const express = require('express')
-const bootcampRoutes = require('./routes/bootcampRoutes')
-const courseRoutes = require('./routes/courseRoutes')
 const dotenv = require('dotenv')
 const color = require('colors')
 const connectDB = require('./database/db')
 const morgan = require('morgan')
 const errorHandler = require('./middleware/error')
+const fileUpload = require("express-fileupload")
+const path = require('path')
+
+// Route Handlers
+const bootcampRoutes = require('./routes/bootcampRoutes')
+const courseRoutes = require('./routes/courseRoutes')
+const authRoutes = require('./routes/authRoutes')
+
 // Initializing Express
 const app = express()
 
@@ -26,9 +32,19 @@ app.use(morgan("dev"))
 // Activate body parser
 app.use(express.json())
 
+// Activate file upload
+app.use(fileUpload())
+
+// Static folder
+app.use(express.static(`${path.join(__dirname, "public")}`))
+
+
 // Mount Router
 app.use('/api/v1/bootcamps', bootcampRoutes)
 app.use('/api/v1/courses', courseRoutes)
+app.use('/api/v1/auth', authRoutes)
+
+// Error Handler
 app.use(errorHandler)
 
 // Liten to Port

@@ -7,29 +7,25 @@ const asyncHandler = require("../middleware/aysnc");
 // GET: api/v1/bootcamps/:bootcampId/courses
 // access: Public
 exports.getCourses = asyncHandler(async (req, res) => {
-    let query;
+
 
     // Get all the courses specific to a bootcamp
     if (req.params.bootcampId) {
-        query = Course.find({ bootcamp: req.params.bootcampId }).populate({
+        const courses = await Course.find({ bootcamp: req.params.bootcampId }).populate({
             path: "bootcamp",
             select: "name description"
 
         })
 
+        return res.status(200).json({success:true, count: courses.length, data: courses})
+
         // Get all the courses
     } else {
-        query = Course.find().populate({
-            path: "bootcamp",
-            select: "name description"
+        res.status(200).json(res.queryResult)
 
-        });
-
-        query.sort("-createdAt")
     }
 
-    const courses = await query;
-    res.status(200).json({ success: true, count: courses.length, data: courses })
+
 
 })
 

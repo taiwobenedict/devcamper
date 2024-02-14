@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router({ mergeParams: true})
+const course = require('../database/models/Courses')
 
 // Import Controllers
 const {
@@ -10,10 +11,17 @@ const {
   deleteCourse
 } = require('../controllers/courses')
 
+// Import Advance query
+const advanceQuery = require('../middleware/qureyResult')
+
 
 // Routes without Id's
 router.route("/")
-  .get(getCourses)
+  .get(advanceQuery(course, {
+    path: "bootcamp",
+    select: "name description"
+
+}), getCourses)
   .post(addCourse)
 
 // Routes with Id's
